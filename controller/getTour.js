@@ -6,6 +6,7 @@ const Tour = require("../modle/tourModle")
 
 app.use(express.json())
 
+
 module.exports.getTours = async (req, res) => {
 
     try {
@@ -27,7 +28,7 @@ module.exports.getTours = async (req, res) => {
 
         //counting the total number of documents on collection 
         let totalDocument = await Tour.countDocuments()
-        console.log(totalDocument)
+       
 
         //logic for limiting and skiping the content(pagination)
         if ((req.query.limit * 1) > totalDocument) {
