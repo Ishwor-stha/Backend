@@ -35,7 +35,7 @@ const tourSchema = new mongoose.Schema({
         required: [true, 'A tour must have a difficulty'],
         // built in validator "gives error if a user gives data other than easy,hard and medium"
         enum:{
-            value:['easy','difficult','medium'],
+            values:['easy','difficult','medium'],
             message:'A difficutly must be easy,medium or hard'
 
         }
@@ -55,7 +55,19 @@ const tourSchema = new mongoose.Schema({
         type: Number,
         required: [true, 'You need to specify price']
     },
-    priceDiscount: Number,
+    priceDiscount: 
+    {
+        type:Number,
+        //custom validator :if the discount price is greater than the actual price then it returns false and automatically gives custom error 
+      //NOTE :Below validator only works while creating new document.Doesnot work while updating the document
+        validate:{
+            validator:function(val){//val takes the data of priceDiscount
+                return this.price>val  //If the price is greater than discount price it returns false 
+
+            },
+            message:"The discount price should be less than the actual price of an object"
+        }
+    },
     summary: {
         type: String,
         trim: true,// trim method cuts the extra space in the begining and the end of string 
@@ -85,3 +97,5 @@ tourSchema.pre("save", function (next) {
 const Tour = mongoose.model('tours', tourSchema)//Tour = collection name in DB,Tourschema=documents inside Tour tour module
 
 module.exports = Tour
+
+// validate validator message

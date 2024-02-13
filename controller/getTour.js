@@ -16,9 +16,9 @@ module.exports.getTours = async (req, res) => {
 
 
         //variables for  sorting
-        let sort = {}
+        
         let sortName = req.query.sort
-        let sortOrder = 1
+        
         //variable for storing the name of fieldName for select mongoose method
         let fieldNames = ""
         //Variables for pagination
@@ -40,19 +40,7 @@ module.exports.getTours = async (req, res) => {
             limit = req.query.limit * 1
             skip = (page - 1) * limit
         }
-
-
-
-
-        //logic for sorting the content
-        if (req.query.sort) {
-            if (req.query.order === 'desc') {
-                sortOrder = -1
-            }
-            sort[sortName] = sortOrder
-
-
-        }
+        
         //logic for receiving the field name and  for using on select mongoose method 
         if (req.query.fields) {
             fieldNames = req.query.fields
@@ -63,7 +51,7 @@ module.exports.getTours = async (req, res) => {
         // let tour = await Tour.find(query).sort(sort).select(fieldNames)
 
         //quering the request on the database
-        let tour = await Tour.find().sort(sort).select(fieldNames).skip(skip).limit(limit)
+        let tour = await Tour.find().sort(sortName).select(fieldNames).skip(skip).limit(limit)
 
 
         res.status(200).json({
