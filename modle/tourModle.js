@@ -98,4 +98,3 @@ const Tour = mongoose.model('tours', tourSchema)//Tour = collection name in DB,T
 
 module.exports = Tour
 
-// validate validator message
