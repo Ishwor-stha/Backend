@@ -29,7 +29,14 @@ connectMongodb()
 app.route('/api/v1/tours').get(tours.getTours).post(tours.postTour)
 app.route('/api/v1/tours/:id').get(tours.getOnlyOneTour).patch(tours.updateById).delete(tours.deleteById)
 
-
+// handling error if user enter other route than defined route
+// .all accepts all request method (get,post,patch,delete)and "*" accepts all route url
+app.all('*',(req,res,next)=>{
+    res.status(404).json({
+        status:"fail",
+        message:`cannot find ${req.originalUrl} route`
+    })
+})
 
 
 const port = process.env.PORT//importing port from config.env file
