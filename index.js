@@ -6,7 +6,7 @@ const mongoose = require('mongoose')
 
 
 app.use(express.json())
-//importing the variables from config.env file
+//configuring the path for importing the details from config.env file
 dotenv.config({ path: './config.env' })
 
 //Importing the mongodb connection string and replacing the <password> field from config.env file
@@ -28,7 +28,7 @@ async function connectMongodb() {
 // calling a function to connect with database
 connectMongodb()
 
-// route section
+// ROUTE SECTION
 app.route('/api/v1/tours').get(tours.getTours).post(tours.postTour)
 app.route('/api/v1/tours/:id').get(tours.getOnlyOneTour).patch(tours.updateById).delete(tours.deleteById)
 
@@ -46,10 +46,14 @@ app.all('*', (req, res, next) => {
 
 })
 
+
+
 //creating an error handling middleware 
 app.use((err, req, res, next) => {
-    err.statusCode = err.statusCode || 500 //if there is no status code by then it will be 500
-    err.status = err.status || "error" //if there is no status then the status will be error
+    //if there is no status code by then it will be 500
+    err.statusCode = err.statusCode || 500 
+    //if there is no status then the status will be error
+    err.status = err.status || "error"
     // sending response
     res.status(err.statusCode).json({
         status: err.status,
