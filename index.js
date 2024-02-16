@@ -25,11 +25,14 @@ async function connectMongodb() {
     }
 
 }
-// 
+// calling a function to connect with database
 connectMongodb()
 
+// route section
 app.route('/api/v1/tours').get(tours.getTours).post(tours.postTour)
 app.route('/api/v1/tours/:id').get(tours.getOnlyOneTour).patch(tours.updateById).delete(tours.deleteById)
+
+
 
 // handling error if user enter other route than defined route
 // .all accepts all request method (get,post,patch,delete)and "*" accepts all route url
