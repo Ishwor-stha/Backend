@@ -37,17 +37,20 @@ app.route('/api/v1/tours/:id').get(tours.getOnlyOneTour).patch(tours.updateById)
 // handling error if user enter other route than defined route
 // .all accepts all request method (get,post,patch,delete)and "*" accepts all route url
 app.all('*', (req, res, next) => {
+    // creating an error if user enters undefined route
     const err = new Error(`cannot find ${req.originalUrl} route.`)
-    err.status = fail
+    err.status = "fail"
     err.statusCode = 404
-    next(err)//passing any value to next  method triggers the error handling middleware and directily jumps to the error handling middleware
+    //passing any value to next  method triggers the error handling middleware and directily jumps to the error handling middleware
+    next(err)
 
 })
 
 //creating an error handling middleware 
 app.use((err, req, res, next) => {
-    err.statusCode = err.statusCode || 500
-    err.status = err.status || "error"
+    err.statusCode = err.statusCode || 500 //if there is no status code by then it will be 500
+    err.status = err.status || "error" //if there is no status then the status will be error
+    // sending response
     res.status(err.statusCode).json({
         status: err.status,
         message: err.message
