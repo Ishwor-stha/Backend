@@ -39,7 +39,7 @@ app.route('/api/v1/tours/:id').get(tours.getOnlyOneTour).patch(tours.updateById)
 // handling error if user enter other route than defined route
 // .all accepts all request method (get,post,patch,delete)and "*" accepts all route url
 app.all('*', (req, res, next) => {
-    // calling errorHandling classs wihile passing two values
+    // calling errorHandling classs while passing two arguments
     next(new errorHandling(`The request url ${req.originalUrl} is not avaiable`,404))
 
 })
