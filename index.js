@@ -3,6 +3,8 @@ const app = express()
 const tours = require('./controller/getTour')
 const dotenv = require('dotenv')
 const mongoose = require('mongoose')
+const errorHandling=require('./util/errorHandling')
+const errorController=require('./controller/errorController')
 
 
 app.use(express.json())
@@ -37,30 +39,15 @@ app.route('/api/v1/tours/:id').get(tours.getOnlyOneTour).patch(tours.updateById)
 // handling error if user enter other route than defined route
 // .all accepts all request method (get,post,patch,delete)and "*" accepts all route url
 app.all('*', (req, res, next) => {
-    // creating an error if user enters undefined route
-    const err = new Error(`cannot find ${req.originalUrl} route.`)
-    err.status = "fail"
-    err.statusCode = 404
-    //passing any value to next  method triggers the error handling middleware and directily jumps to the error handling middleware
-    next(err)
+    // calling errorHandling classs wihile passing two values
+    next(new errorHandling(`The request url ${req.originalUrl} is not avaiable`,404))
 
 })
 
 
 
-//creating an error handling middleware 
-app.use((err, req, res, next) => {
-    //if there is no status code by then it will be 500
-    err.statusCode = err.statusCode || 500 
-    //if there is no status then the status will be error
-    err.status = err.status || "error"
-    // sending response
-    res.status(err.statusCode).json({
-        status: err.status,
-        message: err.message
-    })
-})
-
+//redirecting to the error handling middleware  
+app.use(errorController)
 
 
 const port = process.env.PORT//importing port from config.env file
