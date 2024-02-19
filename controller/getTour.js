@@ -1,13 +1,14 @@
 const express = require('express')
 const app = express()
 const Tour = require("../modle/tourModle")
+const errorHandling=require('../util/errorHandling')
 
 
 
 app.use(express.json())
 
 
-module.exports.getTours = async (req, res) => {
+module.exports.getTours = async (req, res,next) => {
 
     try {
         // let query = JSON.stringify(req.query)
@@ -64,15 +65,10 @@ module.exports.getTours = async (req, res) => {
         })
 
 
-    } catch (error) {
-        res.status(404).json({
-            status: "fail",
-            Error: error.message
+    } catch (error){next(new errorHandling(error.message,404))}
 
-        })
-
-    }
 }
+
 
 //CREATING A FUNCTION WHICH IS USED TO CREATE A NEW TOUR AND POST IT IN A JSON FILE
 module.exports.postTour = async (req, res) => {
@@ -88,15 +84,7 @@ module.exports.postTour = async (req, res) => {
         })
 
 
-    } catch (error) {
-        res.status(404).json({
-            status: 'fail',
-            Error: {
-                error
-            }
-        })
-
-    }
+    } catch (error){next(new errorHandling(error.message,404))}
 }
 
 
@@ -112,16 +100,7 @@ module.exports.getOnlyOneTour = async (req, res) => {
             tour
 
         })
-    } catch (error) {
-        res.status(404).json({
-            status: 'error',
-            Error: {
-                error
-            }
-        })
-
-    }
-
+    } catch (error){next(new errorHandling(error.message,404))}
 
 
 
@@ -138,15 +117,7 @@ module.exports.updateById = async (req, res) => {
 
 
         })
-    } catch (error) {
-        res.status(404).json({
-            status: 'error',
-            Error: {
-                error
-            }
-        })
-
-    }
+    }  catch (error){next(new errorHandling(error.message,404))}
 }
 module.exports.deleteById = async (req, res) => {
     try {
@@ -157,12 +128,5 @@ module.exports.deleteById = async (req, res) => {
         })
 
 
-    } catch (error) {
-        res.status(404).json({
-            status: 'fail',
-            Error: {
-                error
-            }
-        })
-    }
+    } catch (error){next(new errorHandling(error.message,404))}
 }
