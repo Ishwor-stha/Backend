@@ -90,29 +90,22 @@ module.exports.postTour = async (req, res, next) => {
             }
 
         })
-
-
     } catch (error) { next(new errorHandling(error.message, 404)) }
 }
 
 
 //CREATING A FUNCTION WHICH TAKES THE ID AND RETURNS THE RESPECTIVE TOUR DETAILS
-
-
-
 module.exports.getOnlyOneTour = async (req, res, next) => {
 
     try {
         const tour = await Tour.findById(req.params.id)
+
         res.json({
             status: 'success',
             tour
 
         })
-
-
-
-    } catch (error) { next(new errorHandling(error.message, 404)) }
+    } catch (error) { next(new errorHandling(`An Id is invalid or there is no data corresponding to ${req.params.id} id`, 404)) }
 
 
 }
@@ -125,8 +118,6 @@ module.exports.updateById = async (req, res, next) => {
             updated: {
                 tour
             }
-
-
         })
     } catch (error) { next(new errorHandling(error.message, 404)) }
 }
@@ -137,7 +128,6 @@ module.exports.deleteById = async (req, res, next) => {
             status: 'success',
 
         })
-
 
     } catch (error) { next(new errorHandling(error.message, 404)) }
 }
