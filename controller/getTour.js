@@ -13,7 +13,13 @@ const pagination = (limit, page) => {
     return (page - 1) * limit
 
 }
-
+const asyncFunction = (func) => {
+    return (req, res, next) => {
+        func(req, res, next).catch(err => {
+            errorHandling(err.message, 404)
+        })
+    }
+}
 
 module.exports.getTours = async (req, res, next) => {
 
@@ -92,19 +98,19 @@ module.exports.postTour = async (req, res, next) => {
 
 
 
-module.exports.getOnlyOneTour = async (req, res, next) => {
-    try {
-        const tour = await Tour.findById(req.params.id)
-        res.json({
-            status: 'success',
-            tour
+module.exports.getOnlyOneTour = asyncFunction(async (req, res, next) => {
 
-        })
-    } catch (error) { next(new errorHandling(error.message, 404)) }
+    const tour = await Tour.findById(req.params.id)
+    res.json({
+        status: 'success',
+        tour
 
+    })
 
 
-}
+
+
+})
 module.exports.updateById = async (req, res, next) => {
     try {
         const update = req.body
