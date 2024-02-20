@@ -94,7 +94,7 @@ tourSchema.pre("save", function (next) {
     this.slug = slugify(this.name)//this.slug selcts the slug schema same goes to this.name
     next()// if there is another mongoose middleware  then it will forward to that middlewarae 
 })
-const Tour = mongoose.model('tours', tourSchema)//Tour = collection name in DB,Tourschema=documents inside Tour tour module
+const Tour = mongoose.model('Tours', tourSchema)//Tour = collection name in DB,Tourschema=documents inside Tour tour module
 
 module.exports = Tour
 
