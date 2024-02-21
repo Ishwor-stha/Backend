@@ -45,7 +45,6 @@ app.all('*', (req, res, next) => {
 })
 
 
-
 //redirecting to the error handling middleware  
 app.use(errorController)
 
