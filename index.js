@@ -5,6 +5,7 @@ const dotenv = require('dotenv')
 const mongoose = require('mongoose')
 const errorHandling=require('./util/errorHandling')
 const errorController=require('./controller/errorController')
+const User=require('./controller/userController')
 
 
 app.use(express.json())
@@ -31,6 +32,10 @@ async function connectMongodb() {
 connectMongodb()
 
 // ROUTE SECTION
+
+// User section
+app.route('/api/v1/tours/user').post(User.createUser)
+// tours section
 app.route('/api/v1/tours').get(tours.getTours).post(tours.postTour)
 app.route('/api/v1/tours/:id').get(tours.getOnlyOneTour).patch(tours.updateById).delete(tours.deleteById)
 
