@@ -33,20 +33,23 @@ const userSchema=mongoose.Schema({
         minLength:[8,'Password must be at least of 8 word'],
         validate:{
             validator:function(val){
-                return val===this.password
+                return val===this.password//val takes passwordConfirm data as an argument
             },
             message:"Password must be same in password Confirm "
         }
     }
 
 })
-// hasing the password before 
+// hasing the password before saving the document
 userSchema.pre("save",async function(next){
+    // return next and terminate the middleware if the password is not modified
+    // The below logic is neccessary because every time if we try to update the document this middleware will be called hence to avoid hashing already hashed password unless the password field is being modified
     if(!this.isModified("password")){
-        return next()
+        return next()//Terminates this middeware and calls next middleware
     }
+    // hashing the password and storing it to a password schema
     this.password=await bcrypt.hash(this.password,10)
-    
+    // muting the passwordConfirm because it stores unhashed password  
     this.passwordConfirm=undefined
     next()
 })
