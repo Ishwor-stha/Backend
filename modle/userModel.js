@@ -43,7 +43,7 @@ const userSchema=mongoose.Schema({
 // hasing the password before saving the document
 userSchema.pre("save",async function(next){
     // return next and terminate the middleware if the password is not modified
-    // The below logic is neccessary because every time if we try to update the document this middleware will be called hence to avoid hashing already hashed password unless the password field is being modified
+    // The below logic is neccessary because every time if we try to update the document this middleware will be called hence to avoid hashing already hashed password unless the password is being modified
     if(!this.isModified("password")){
         return next()//Terminates this middeware and calls next middleware
     }
