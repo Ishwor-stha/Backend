@@ -1,6 +1,7 @@
 const mongoose=require("mongoose")
 const User=require('../modle/userModel')
 const errorHandling=require('../util/errorHandling')
+const jwt=require('jsonwebtoken')
 
 module.exports.createUser=async(req,res,next)=>{
     try{
@@ -15,7 +16,10 @@ module.exports.createUser=async(req,res,next)=>{
             password:req.body.password,
             passwordConfirm:req.body.passwordConfirm
         })
-        res.status(200).json({
+        // creating a JWT Token {payload is the newly created id of user },secretkey,and the JWT Expiration date=30days 
+        const token=jwt.sign({ id: createNewUser._id},process.env.JWT_SECRETKEY,process.env.JWT_EXPIRE_DateInDay)
+        res.status(201).json({
+            token:token,
             status:"success",
             userDetail:createNewUser
 
