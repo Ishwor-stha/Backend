@@ -48,7 +48,7 @@ userSchema.pre("save",async function(next){
         return next()//Terminates this middeware and calls next middleware
     }
     // hashing the password and storing it to a password schema
-    this.password=await bcrypt.hash(this.password,10)
+    this.password=await bcrypt.hash(this.password,12)
     // muting the passwordConfirm because it stores unhashed password  
     this.passwordConfirm=undefined
     next()
