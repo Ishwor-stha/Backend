@@ -1,4 +1,4 @@
-const auth=require('../controller/authController')
+const auth=require('../controller/authController')//importing the authController middlewares
 const express = require('express')
 const router= express.Router()
 
