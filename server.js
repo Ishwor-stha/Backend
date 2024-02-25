@@ -1,11 +1,12 @@
 const express = require('express')
 const app = express()
-const tours = require('./controller/getTour')
 const dotenv = require('dotenv')
 const mongoose = require('mongoose')
 const errorHandling=require('./util/errorHandling')
 const errorController=require('./controller/errorController')
-const User=require('./controller/userController')
+const tourRoute=require('./routing/tourRoute')
+const userRoute=require('./routing/userRoute')
+
 
 
 app.use(express.json())
@@ -34,10 +35,10 @@ connectMongodb()
 // ROUTE SECTION
 
 // User section
-app.route('/api/v1/tours/user').post(User.createUser)
+app.use('/api/v1/user',userRoute)
 // tours section
-app.route('/api/v1/tours').get(tours.getTours).post(tours.postTour)
-app.route('/api/v1/tours/:id').get(tours.getOnlyOneTour).patch(tours.updateById).delete(tours.deleteById)
+app.use('/api/v1/tours',tourRoute)
+
 
 
 
