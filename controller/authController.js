@@ -29,20 +29,29 @@ module.exports.createUser = async (req, res, next) => {
 }
 
 module.exports.login =async (req, res, next) => {
-
+// Taking userName from client side
     const userName = req.body.name
+    // taking password from client side
     const userPassword = req.body.password
-    if (!userName || !userPassword) return next(new errorHandling("Please enter username or password", 401))
-
-    const DbUserDetail=await User.findOne({name:userName})
-    if(!DbUserDetail) return next(new errorHandling("The username or password is incorrect",401))
-    const dbPassword=DbUserDetail.password
+    // it there is no user name or password then terminate current middleware and call errorhandling middleware with two argument ie(errormessage,statusCode)
+    if (!userName || !userPassword) return next(new errorHandling("Please enter username or password", 400))
     
-    const validPassword=await bcrypt.compare(userPassword,dbPassword)
-    console.log(validPassword)
+// searching the document of user in DataBase providing username which we have received form clientSide
+    const DbUserDetail=await User.findOne({name:userName})
 
+    // if there is no userDetail then terminate current middleware and call errorhandling middleware
+    if(!DbUserDetail) return next(new errorHandling("The username or password is incorrect",401))
+   
+    // storing the hashed userpassword of db in variable
+    const dbPassword=DbUserDetail.password
+
+    // comparing the hashed Database password and the password of Client side using bcrypt  
+    const validPassword=await bcrypt.compare(userPassword,dbPassword)//true/false
+
+    // if password doesnot match then terminate this/current middleware and call error handling middleware
     if(!validPassword)return next(new errorHandling("The username or password is incorrect",401))
 
+    // if password and username is valid then send the response
     res.status(200).json({
         status:"success",
         message:"you have loged in"
@@ -53,4 +62,3 @@ module.exports.login =async (req, res, next) => {
 
 
 }
-// Valid user token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1ZGIwODQ5YmIxYTYwZWJmYWI1YmYzMyIsImlhdCI6MTcwODg1MzMyMiwiZXhwIjoxNzExNDQ1MzIyfQ.3kJzCfcvLKpgZTFJCYQjHGXj5jXvT-fIhmUnDIo_kbI
