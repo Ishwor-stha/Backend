@@ -34,11 +34,12 @@ module.exports.login =async (req, res, next) => {
     const userPassword = req.body.password
     if (!userName || !userPassword) return next(new errorHandling("Please enter username or password", 401))
 
-    const dbUserName=await User.findOne({userName})
-    if(!dbUserName) return next(new errorHandling("The username or password is incorrect",401))
-    const dbPassword=dbUserName.password
+    const DbUserDetail=await User.findOne({name:userName})
+    if(!DbUserDetail) return next(new errorHandling("The username or password is incorrect",401))
+    const dbPassword=DbUserDetail.password
     
     const validPassword=await bcrypt.compare(userPassword,dbPassword)
+    console.log(validPassword)
 
     if(!validPassword)return next(new errorHandling("The username or password is incorrect",401))
 
