@@ -63,7 +63,7 @@ module.exports.login = async (req, res, next) => {
 
 }
 
-module.exports.protect =async (req, res, next) => {
+module.exports.protect = async (req, res, next) => {
     let token
     if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
         let arrayString = req.headers.authorization.split(" ")
@@ -72,10 +72,14 @@ module.exports.protect =async (req, res, next) => {
     }
 
     if (!token) next(new errorHandling("please login to get access", 401))
-    
-    const isValid= await jwt.verify(token,process.env.JWT_SECRETKEY)
-    console.log(isValid)
+    let decode
+    try {
+         decode = jwt.verify(token, process.env.JWT_SECRETKEY)
+    }catch(err){next(new errorHandling("Forbidden to get access",403))}
 
+        const userAvaiable=await User.findById(decode.id)
+        console.log(userAvaiable);
+        if(!userAvaiable) next(new errorHandling("Please create a account ",400))
 
     next()
 }
