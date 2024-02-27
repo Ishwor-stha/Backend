@@ -65,20 +65,28 @@ module.exports.login = async (req, res, next) => {
 
 module.exports.protect = async (req, res, next) => {
     let token
+    //Receiving token
+    // if the request header contains authorization and which starts with Bearer then
+
     if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
-        let arrayString = req.headers.authorization.split(" ")
+        // example =Bearer uniqueToken
+        let arrayString = req.headers.authorization.split(" ")//converting token string in to array eg['Bearer','uniqueToken']
         token = arrayString[1]
 
     }
-
+    // if there no token then call errorhandling middleware with error message and status code
     if (!token) next(new errorHandling("please login to get access", 401))
     let decode
+    // decoding the token received from  client side /verifying 
     try {
-         decode = jwt.verify(token, process.env.JWT_SECRETKEY)
-    }catch(err){next(new errorHandling("Forbidden to get access",403))}
+        decode = jwt.verify(token, process.env.JWT_SECRETKEY)
+    } catch (err) { next(new errorHandling("Forbidden to get access", 403)) }//if something wrong with token then give error
 
-        const userAvaiable=await User.findById(decode.id)
-        if(!userAvaiable) next(new errorHandling("Please create a account ",400))
+    //if token is valid then check if user is still available
+    const userAvaiable = await User.findById(decode.id)
+
+    //if user is not avaiable then  
+    if (!userAvaiable) next(new errorHandling("Please create a account ", 400))
 
     next()
 }
