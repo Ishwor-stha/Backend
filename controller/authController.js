@@ -78,7 +78,6 @@ module.exports.protect = async (req, res, next) => {
     }catch(err){next(new errorHandling("Forbidden to get access",403))}
 
         const userAvaiable=await User.findById(decode.id)
-        console.log(userAvaiable);
         if(!userAvaiable) next(new errorHandling("Please create a account ",400))
 
     next()
