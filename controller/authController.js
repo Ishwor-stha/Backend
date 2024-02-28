@@ -88,16 +88,18 @@ module.exports.protect = async (req, res, next) => {
 
     //if user is not avaiable then  
     if (!userAvaiable) next(new errorHandling("Please create a account ", 400))
+    // storing user role in req.role. (I stored  making new .role to check if role of an user in next middleware ie(isadmin))
     req.role=userAvaiable.role
-    next()
+    next()//calling next middleware
 }
 
 module.exports.isAdmin=(req,res,next)=>{
-    const role=req.role
-    console.log(role)
+    const role=req.role//storing the role taken from previous middleware(protect)
+    // if role is not admin the throw error 
     if(role!="admin"){
         return next(new errorHandling("You are not allowed to perform this action",401))
     }   
      
+    //otherwise call next middle ware
     next()
 }
