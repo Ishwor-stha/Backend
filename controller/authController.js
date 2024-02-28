@@ -80,13 +80,24 @@ module.exports.protect = async (req, res, next) => {
     // decoding the token received from  client side /verifying 
     try {
         decode = jwt.verify(token, process.env.JWT_SECRETKEY)
-    } catch (err) { next(new errorHandling("Forbidden to get access", 403)) }//if something wrong with token then give error
+    } catch (err) {
+        next(new errorHandling("Forbidden to get access", 403)) }//if something wrong with token then give error
 
     //if token is valid then check if user is still available
     const userAvaiable = await User.findById(decode.id)
 
     //if user is not avaiable then  
     if (!userAvaiable) next(new errorHandling("Please create a account ", 400))
+    req.role=userAvaiable.role
+    next()
+}
 
+module.exports.isAdmin=(req,res,next)=>{
+    const role=req.role
+    console.log(role)
+    if(role!="admin"){
+        return next(new errorHandling("You are not allowed to perform this action",401))
+    }   
+     
     next()
 }

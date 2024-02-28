@@ -18,6 +18,10 @@ const userSchema=mongoose.Schema({
         validate:[validator.isEmail,"Please enter a valid email"]
 
     },
+    role:{
+        type:String,
+        default:"user"
+    },
     // photo is optional
     photo:{
         photo:String
