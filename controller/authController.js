@@ -103,3 +103,9 @@ module.exports.isAdmin=(req,res,next)=>{
     //otherwise call next middle ware
     next()
 }
+
+module.exports.forgotPassword=async (req,res,next)=>{
+    const userEmail=req.body.email
+    const fetchUser=User.findOne({email:userEmail})
+    if(!fetchUser) next(new errorHandling("Cannot found this email ",404))
+}

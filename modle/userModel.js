@@ -1,6 +1,7 @@
 const mongoose=require('mongoose')
 const validator=require('validator')
 const bcrypt=require('bcryptjs')
+const crypto=require('crypto')
 
 
 const userSchema=mongoose.Schema({
@@ -41,7 +42,9 @@ const userSchema=mongoose.Schema({
             },
             message:"Password must be same in password Confirm "
         }
-    }
+    },
+    passwordResetToken:String,
+    passwordExpiryTime:Date
 
 })
 // hasing the password before saving the document
@@ -57,6 +60,14 @@ userSchema.pre("save",async function(next){
     this.passwordConfirm=undefined
     next()
 })
+userSchema.methods.createPasswordResetToken=async function(){
+    const resetToken=await crypto.reandomBytes(32).toString('hex')
+    this.passwordResetToken=await bcrypt.hash(resetToken,12)
+    this.passwordExpiryTime=Date.now +10*60*1000
+
+    return resetToken
+
+}
 
 const User=mongoose.model("User",userSchema)
 module.exports=User
