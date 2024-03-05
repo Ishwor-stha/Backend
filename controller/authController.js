@@ -106,6 +106,17 @@ module.exports.isAdmin=(req,res,next)=>{
 
 module.exports.forgotPassword=async (req,res,next)=>{
     const userEmail=req.body.email
-    const fetchUser=User.findOne({email:userEmail})
-    if(!fetchUser) next(new errorHandling("Cannot found this email ",404))
+    const fetchUser=await User.findOne({email:userEmail})
+    if(!fetchUser) return next(new errorHandling("Cannot found this email ",404))
+    
+    const resetToken=await fetchUser.createPasswordResetToken()
+    fetchUser.save()
+    
+    res.status(200).json({
+        resetToken
+    })
+
+
+
+
 }

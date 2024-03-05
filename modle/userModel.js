@@ -25,7 +25,7 @@ const userSchema=mongoose.Schema({
     },
     // photo is optional
     photo:{
-        photo:String
+        type:String
     },
     password:{
         type:String,
@@ -35,7 +35,6 @@ const userSchema=mongoose.Schema({
     passwordConfirm:{
         type:String,
         required:[true,'Please confirm your password'],
-        minLength:[8,'Password must be at least of 8 word'],
         validate:{
             validator:function(val){
                 return val===this.password//val takes passwordConfirm data as an argument
@@ -60,14 +59,20 @@ userSchema.pre("save",async function(next){
     this.passwordConfirm=undefined
     next()
 })
-userSchema.methods.createPasswordResetToken=async function(){
-    const resetToken=await crypto.reandomBytes(32).toString('hex')
-    this.passwordResetToken=await bcrypt.hash(resetToken,12)
-    this.passwordExpiryTime=Date.now +10*60*1000
+userSchema.methods.createPasswordResetToken = async function () {
+    try {
+        const resetToken = await crypto.randomBytes(32).toString('hex');
+        this.passwordResetToken = await bcrypt.hash(resetToken, 12);
+        this.passwordExpiryTime = Date.now() + 10 * 60 * 1000;
 
-    return resetToken
+        return resetToken;
+    } catch (err) {
+        // Handle errors here
+        console.error(err);
+        throw err;
+    }
+};
 
-}
 
 const User=mongoose.model("User",userSchema)
 module.exports=User
