@@ -110,8 +110,13 @@ module.exports.forgotPassword=async (req,res,next)=>{
     if(!fetchUser) return next(new errorHandling("Cannot found this email ",404))
     console.log("above reset token");
     const resetToken=await fetchUser.createPasswordResetToken()
-    console.log("above save")
-    fetchUser.save()
+
+    // disabling all the validators we defined on userSchema
+    /* disabling the validator is must while updating the current document because the validators 
+    runs while updating the documents and we are only passsing the One field not all hence it create validation error 
+    to resolve this problem  validator must be disable */ 
+
+    fetchUser.save({validateBeforeSave:false})
     
     res.status(200).json({
         resetToken
