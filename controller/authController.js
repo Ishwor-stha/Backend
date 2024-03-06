@@ -108,8 +108,9 @@ module.exports.forgotPassword=async (req,res,next)=>{
     const userEmail=req.body.email
     const fetchUser=await User.findOne({email:userEmail})
     if(!fetchUser) return next(new errorHandling("Cannot found this email ",404))
-    
+    console.log("above reset token");
     const resetToken=await fetchUser.createPasswordResetToken()
+    console.log("above save")
     fetchUser.save()
     
     res.status(200).json({
