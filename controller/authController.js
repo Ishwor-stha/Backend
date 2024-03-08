@@ -2,6 +2,8 @@ const User = require('../modle/userModel')
 const errorHandling = require('../util/errorHandling')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
+const nodemailer = require('nodemailer')
+
 
 // controller for creating the new user /registering the new user
 module.exports.createUser = async (req, res, next) => {
@@ -115,6 +117,32 @@ module.exports.isAdmin = (req, res, next) => {
 }
 
 
+function sendMail(resetToken) {
+    try {
+        let token=resetToken
+        const message=`your reset token localhost:3000/forgotPassword/${token}`
+        const transporter = nodemailer.createTransport({
+            host: 'smtp.ethereal.email',
+            port: 587,
+            auth: {
+                user: 'anastacio.okuneva@ethereal.email',
+                pass: '1QgxbvUvm5N67kZ7Cs'
+            }
+        });
+        async function main() {
+            // send mail with defined transport object
+            const info = await transporter.sendMail({
+                from: '"Echor 👻" <anastacio.okuneva@ethereal.email>', // sender address
+                to: " <anastacio.okuneva@ethereal.email>", // list of receivers
+                subject: "reset token", // Subject line
+                text: "Reset token", // plain text body
+                html: message, // html body
+            });
+
+            console.log("Message sent: %s", info.messageId);
+        }
+    } catch (err) { res.status(400).json({ message: err.message }) }
+}
 
 
 // controller for forgotPassword
@@ -137,7 +165,7 @@ module.exports.forgotPassword = async (req, res, next) => {
 
     await fetchUser.save({ validateBeforeSave: false })//saving the updated field
 
-
+    await sendMail(resetToken)
     res.status(200).json({
         resetToken
     })
