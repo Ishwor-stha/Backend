@@ -3,6 +3,7 @@ const errorHandling = require('../util/errorHandling')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
 
+// controller for creating the new user /registering the new user
 module.exports.createUser = async (req, res, next) => {
     try {
         // const createNewUser=await User.create(req.body)
@@ -28,6 +29,10 @@ module.exports.createUser = async (req, res, next) => {
 
 }
 
+
+
+
+// controller for checking the neccessary detail to login the system
 module.exports.login = async (req, res, next) => {
     // Taking userName from client side
     const userName = req.body.name
@@ -57,12 +62,12 @@ module.exports.login = async (req, res, next) => {
         message: "you have loged in"
     })
 
-
-
-
-
 }
 
+
+
+
+// controller for checking the if the user is login or not 
 module.exports.protect = async (req, res, next) => {
     let token
     //Receiving token
@@ -81,7 +86,8 @@ module.exports.protect = async (req, res, next) => {
     try {
         decode = jwt.verify(token, process.env.JWT_SECRETKEY)
     } catch (err) {
-        next(new errorHandling("Forbidden to get access", 403)) }//if something wrong with token then give error
+        next(new errorHandling("Forbidden to get access", 403))
+    }//if something wrong with token then give error
 
     //if token is valid then check if user is still available
     const userAvaiable = await User.findById(decode.id)
@@ -89,39 +95,52 @@ module.exports.protect = async (req, res, next) => {
     //if user is not avaiable then  
     if (!userAvaiable) next(new errorHandling("Please create a account ", 400))
     // storing user role in req.role. (I stored  making new .role to check if role of an user in next middleware ie(isadmin))
-    req.role=userAvaiable.role
+    req.role = userAvaiable.role
     next()//calling next middleware
 }
 
-module.exports.isAdmin=(req,res,next)=>{
-    const role=req.role//storing the role taken from previous middleware(protect)
+
+
+
+// controller to see whether user is admin or  not
+module.exports.isAdmin = (req, res, next) => {
+    const role = req.role//storing the role taken from previous middleware(protect)
     // if role is not admin the throw error 
-    if(role!="admin"){
-        return next(new errorHandling("You are not allowed to perform this action",401))
-    }   
-     
+    if (role != "admin") {
+        return next(new errorHandling("You are not allowed to perform this action", 401))
+    }
+
     //otherwise call next middle ware
     next()
 }
 
-module.exports.forgotPassword=async (req,res,next)=>{
-    const userEmail=req.body.email
-    const fetchUser=await User.findOne({email:userEmail})
-    if(!fetchUser) return next(new errorHandling("Cannot found this email ",404))
-    const resetToken=await fetchUser.createPasswordResetToken()
+
+
+
+// controller for forgotPassword
+module.exports.forgotPassword = async (req, res, next) => {
+    const userEmail = req.body.email
+    // is there is no email 
+    if (!userEmail) return next(new errorHandling("Please enter the email ", 400))
+    // fetching the user details using email
+    const fetchUser = await User.findOne({ email: userEmail })
+    // if there  is no user from above email
+    if (!fetchUser) return next(new errorHandling("Cannot found this email ", 404))
+
+    // if all the above conditions are fullfilled then create resetToken 
+    const resetToken = await fetchUser.createPasswordResetToken()//function to create resetToken(see in userModel)
 
     // disabling all the validators we defined on userSchema
     /* disabling the validator is must while updating the current document because the validators 
     runs while updating the documents and we are only passsing the One field not all hence it create validation error 
-    to resolve this problem  validator must be disable */ 
+    to resolve this problem  validator must be disable */
 
-   await fetchUser.save({validateBeforeSave:false})//saving the updated field
-    
+    await fetchUser.save({ validateBeforeSave: false })//saving the updated field
+
+
     res.status(200).json({
         resetToken
     })
-
-
 
 
 }

@@ -68,7 +68,6 @@ userSchema.methods.createPasswordResetToken = async function () {
         return resetToken;
     } catch (err) {
         // Handle errors here
-        console.log("inside create passowrd")
         console.error(err);
         throw err;
     }
