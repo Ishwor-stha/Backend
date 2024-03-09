@@ -2,7 +2,7 @@ const User = require('../modle/userModel')
 const errorHandling = require('../util/errorHandling')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
-const nodemailer = require('nodemailer')
+const sendEmail = require('../util/sendMail')
 
 
 // controller for creating the new user /registering the new user
@@ -117,33 +117,6 @@ module.exports.isAdmin = (req, res, next) => {
 }
 
 
-function sendMail(resetToken) {
-    try {
-        let token=resetToken
-        const message=`your reset token localhost:3000/forgotPassword/${token}`
-        const transporter = nodemailer.createTransport({
-            host: 'smtp.ethereal.email',
-            port: 587,
-            auth: {
-                user: 'anastacio.okuneva@ethereal.email',
-                pass: '1QgxbvUvm5N67kZ7Cs'
-            }
-        });
-        async function main() {
-            // send mail with defined transport object
-            const info = await transporter.sendMail({
-                from: '"Echor 👻" <anastacio.okuneva@ethereal.email>', // sender address
-                to: " <anastacio.okuneva@ethereal.email>", // list of receivers
-                subject: "reset token", // Subject line
-                text: "Reset token", // plain text body
-                html: message, // html body
-            });
-
-            console.log("Message sent: %s", info.messageId);
-        }
-    } catch (err) { res.status(400).json({ message: err.message }) }
-}
-
 
 // controller for forgotPassword
 module.exports.forgotPassword = async (req, res, next) => {
@@ -165,10 +138,27 @@ module.exports.forgotPassword = async (req, res, next) => {
 
     await fetchUser.save({ validateBeforeSave: false })//saving the updated field
 
-    await sendMail(resetToken)
-    res.status(200).json({
-        resetToken
-    })
+    const resetUrl = `${req.protocol}://${req.get('host')}/api/v1/user/resetPassword/${resetToken}`
+    const message = `You have received your reset url.\n\n ${resetUrl} \n\n Your reset url will expire after 10 minutes `
+    try {
+        await sendEmail({
+            subject: "Your reset url",
+            userEmail: fetchUser.email,
+            message: message
+        })
+        res.status(200).json({
+            status:"success",
+            message: "Reset url sent to your mail"
+        })
+
+    } catch (err) {
+        fetchUser.passwordResetToken = undefined
+        fetchUser.passwordExpiryTime = undefined
+        await fetchUser.save({ validateBeforeSave: false })
+        return next(new errorHandling('Error in sending mail.Please try again later', 500))
+    }
+
+    
 
 
 }
