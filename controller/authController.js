@@ -138,13 +138,17 @@ module.exports.forgotPassword = async (req, res, next) => {
 
     await fetchUser.save({ validateBeforeSave: false })//saving the updated field
 
+    // creating the link req.protocol=http/https ,req.get('host')=gives the host name eg localhost:300
     const resetUrl = `${req.protocol}://${req.get('host')}/api/v1/user/resetPassword/${resetToken}`
+
+    //preparing the message 
     const message = `You have received your reset url.\n\n ${resetUrl} \n\n Your reset url will expire after 10 minutes `
+    // calling sendEmail function inside try block
     try {
         await sendEmail({
             subject: "Your reset url",
-            userEmail: fetchUser.email,
-            message: message
+            userEmail: fetchUser.email,//fetchUser object contains user details stored from  above code
+            message: message//from above message variable
         })
         res.status(200).json({
             status:"success",
@@ -152,9 +156,12 @@ module.exports.forgotPassword = async (req, res, next) => {
         })
 
     } catch (err) {
+        // if there is an error then set below field value to undefined
         fetchUser.passwordResetToken = undefined
         fetchUser.passwordExpiryTime = undefined
+        // saving the updated field
         await fetchUser.save({ validateBeforeSave: false })
+        // return the error 
         return next(new errorHandling('Error in sending mail.Please try again later', 500))
     }
 
