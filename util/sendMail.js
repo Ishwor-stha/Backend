@@ -12,17 +12,14 @@ const transporter = nodemailer.createTransport({
 });
 
 async function sendEmail(mailOptions) {
-    try {
-        await transporter.sendMail({
-            from: 'Your Sender Name <' + process.env.Email_userName + '>',
-            to: mailOptions.userEmail,
-            subject: mailOptions.subject,
-            text: mailOptions.message,
-        });
-        console.log('Email sent successfully');
-    } catch (e) {
-        console.error('Error sending email:', e);
-    }
+
+    await transporter.sendMail({
+        from: 'Esor <esor>',
+        to: mailOptions.userEmail,
+        subject: mailOptions.subject,
+        text: mailOptions.message,
+    });
+    console.log('Email sent successfully');
 }
 
 module.exports = sendEmail;
