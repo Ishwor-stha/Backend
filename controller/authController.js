@@ -4,8 +4,9 @@ const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
 const sendEmail = require('../util/sendMail')
 
-
-// controller for creating the new user /registering the new user
+// @method:POST
+// @endpoint :localhost:3000/api/v1/user
+//@desc: controller for creating the new user /registering the new user
 module.exports.createUser = async (req, res, next) => {
     try {
         // const createNewUser=await User.create(req.body)
@@ -32,9 +33,9 @@ module.exports.createUser = async (req, res, next) => {
 }
 
 
-
-
-// controller for checking the neccessary detail to login the system
+// @method:POST
+// @endpoint:localhost:3000/api/v1/user/login
+// @desc:controller for checking the neccessary detail to login the system
 module.exports.login = async (req, res, next) => {
     // Taking userName from client side
     const userName = req.body.name
@@ -69,7 +70,9 @@ module.exports.login = async (req, res, next) => {
 
 
 
-// controller for checking the if the user is login or not 
+
+// @endpoint:there is no end point for this controller
+// @desc:controller for checking the if the user is login or not 
 module.exports.protect = async (req, res, next) => {
     let token
     //Receiving token
@@ -102,9 +105,8 @@ module.exports.protect = async (req, res, next) => {
 }
 
 
-
-
-// controller to see whether user is admin or  not
+//@endPoint :there is no end point for this controller
+// @desc:controller to see whether user is admin or  not
 module.exports.isAdmin = (req, res, next) => {
     const role = req.role//storing the role taken from previous middleware(protect)
     // if role is not admin the throw error 
@@ -116,9 +118,9 @@ module.exports.isAdmin = (req, res, next) => {
     next()
 }
 
-
-
-// controller for forgotPassword
+// @method:POST
+// @endpoint:localhost:3000/api/v1/user/forgotPassword
+// @desc:controller for checking the email and sent the token to the respective user email
 module.exports.forgotPassword = async (req, res, next) => {
     const userEmail = req.body.email
     // is there is no email 
@@ -128,7 +130,7 @@ module.exports.forgotPassword = async (req, res, next) => {
     // if there  is no user from above email
     if (!fetchUser) return next(new errorHandling("Cannot found this email ", 404))
 
-    // if all the above conditions are fullfilled then create resetToken 
+    // if all the above conditions are fullfilled then create resetToken by calling the function created in userModel
     const resetToken = await fetchUser.createPasswordResetToken()//function to create resetToken(see in userModel)
 
     // disabling all the validators we defined on userSchema
@@ -151,12 +153,12 @@ module.exports.forgotPassword = async (req, res, next) => {
             message: message//from above message variable
         })
         res.status(200).json({
-            status:"success",
+            status: "success",
             message: "Reset url sent to your mail"
         })
 
     } catch (err) {
-        // if there is an error then set below field value to undefined
+        // if there is an error in sending email then set below field value to undefined
         fetchUser.passwordResetToken = undefined
         fetchUser.passwordExpiryTime = undefined
         // saving the updated field
@@ -165,7 +167,7 @@ module.exports.forgotPassword = async (req, res, next) => {
         return next(new errorHandling('Error in sending mail.Please try again later', 500))
     }
 
-    
+
 
 
 }

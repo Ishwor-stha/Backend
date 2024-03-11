@@ -7,12 +7,15 @@ const errorHandling = require('../util/errorHandling')
 
 app.use(express.json())
 
+// @desc:founction for creating pagination
 const pagination = (limit, page) => {
     page = page * 1
     limit = limit * 1
     return (page - 1) * limit
 
 }
+
+// @desc:Async handler
 /*
 const asyncFunction = (func) => {
     return (req, res, next) => {
@@ -23,6 +26,18 @@ const asyncFunction = (func) => {
     }
 }
 */
+
+
+// @method:GET
+// @endpoint:localhost:3000/api/v1/tours/
+// @queries:
+//              sorting with field value
+// localhost:3000/api/v1/tours?sort=price    
+//              filtering out the fields
+// localhost:3000/api/v1/tours?fields=name,duration,price,difficulty,summary,ratingAverage
+//               pagination
+// localhost:3000/api/v1/tours?page=1&limit=2
+// @desc:Controller for getting all tours by querying
 module.exports.getTours = async (req, res, next) => {
 
     try {
@@ -76,9 +91,9 @@ module.exports.getTours = async (req, res, next) => {
     } catch (error) { next(new errorHandling(error.message, 404)) }
 
 }
-
-
-//CREATING A FUNCTION WHICH IS USED TO CREATE A NEW TOUR AND POST IT IN A JSON FILE
+// @method:POST
+// @endpoint:localhost:3000/api/v1/tours/
+//@desc:CREATING A FUNCTION WHICH IS USED TO CREATE A NEW TOUR 
 module.exports.postTour = async (req, res, next) => {
     try {
 
@@ -93,8 +108,9 @@ module.exports.postTour = async (req, res, next) => {
     } catch (error) { next(new errorHandling(error.message, 404)) }
 }
 
-
-//CREATING A FUNCTION WHICH TAKES THE ID AND RETURNS THE RESPECTIVE TOUR DETAILS
+// method: GET
+// @endpoint:localhost:3000/api/v1/tours/:id
+//@desc:CREATING A FUNCTION WHICH TAKES THE ID AND RETURNS THE RESPECTIVE TOUR DETAILS
 module.exports.getOnlyOneTour = async (req, res, next) => {
 
     try {
@@ -109,6 +125,10 @@ module.exports.getOnlyOneTour = async (req, res, next) => {
 
 
 }
+
+// @method :PATCH
+// @endpoint:localhost:3000/api/v1/tours/:id
+// @desc:Controller to update field data by id
 module.exports.updateById = async (req, res, next) => {
     try {
         const update = req.body
@@ -121,6 +141,9 @@ module.exports.updateById = async (req, res, next) => {
         })
     } catch (error) { next(new errorHandling(error.message, 404)) }
 }
+// @method :DELETE
+// @endpoint:localhost:3000/api/v1/tours/:id
+// @desc:Controller to delete document  by id
 module.exports.deleteById = async (req, res, next) => {
     try {
         await Tour.findByIdAndDelete(req.params.id)

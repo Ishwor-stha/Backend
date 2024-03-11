@@ -1,6 +1,6 @@
 // error handling middleware
 
-// Function for developers to display detailed error (FOR DEVELOPMENT)
+//@desc: Function for developers to display detailed error (FOR DEVELOPMENT)
 const errorInDevelopment = (err, res) => {
     const statusCode = err.statusCode || 500;
     res.status(statusCode).json({
@@ -11,7 +11,7 @@ const errorInDevelopment = (err, res) => {
     });
 }
 
-// Function for users to display a normal error (FOR PRODUCTION)
+// @desc :Function for users to display a normal error (FOR PRODUCTION)
 const errorInProduction = (err, res) => {
     const statusCode = err.statusCode || 500;
     res.status(statusCode).json({
@@ -20,6 +20,7 @@ const errorInProduction = (err, res) => {
     });
 }
 
+// @desc :Error handling controller 
 module.exports = (err, req, res, next) => {
     // All err data will come through the errorHandling file from the util folder
     // If the node environment is in development
