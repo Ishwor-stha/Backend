@@ -1,31 +1,28 @@
-const nodemailer = require('nodemailer')
+const nodemailer = require('nodemailer');
+require('dotenv').config(); // Load environment variables from a .env file
+
+const transporter = nodemailer.createTransport({
+    host: process.env.Email_host,
+    port: process.env.Email_port,
+    secure: false, // Set to true if your server requires a secure connection
+    auth: {
+        user: process.env.Email_userName,
+        pass: process.env.Email_password,
+    },
+});
 
 async function sendEmail(mailOptions) {
-    // console.log(mailOptions.userEmail);
-    // console.log(mailOptions.message);
-    // console.log(mailOptions.subject);
-    console.log("before transporter");
-    const transporter = nodemailer.createTransport({
-        host:process.env.Email_host,
-        port:process.env.Email_port,
-        auth: {
-            user:process.env.Email_userName,
-            pass:process.env.Email_password
-        }
-    });
-    console.log("after transporter");
-    // send mail with defined transport object
     try {
-
         await transporter.sendMail({
-            from: "Esor Travel and Tour <esortravel@gmail.com>", // sender address
-            to: mailOptions.userEmail, // list of receivers
-            subject: mailOptions.subject, // Subject line
-            text: mailOptions.message, // text body
+            from: 'Your Sender Name <' + process.env.Email_userName + '>',
+            to: mailOptions.userEmail,
+            subject: mailOptions.subject,
+            text: mailOptions.message,
         });
-        console.log("aftr mail");
+        console.log('Email sent successfully');
     } catch (e) {
-        console.log(e)
+        console.error('Error sending email:', e);
     }
 }
-module.exports=sendEmail
+
+module.exports = sendEmail;
