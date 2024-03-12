@@ -160,10 +160,10 @@ module.exports.forgotPassword = async (req, res, next) => {
 
     } catch (err) {
         // if there is an error in sending email then set below field value to undefined
-        /* fetchUser.passwordResetToken = undefined
-         fetchUser.passwordExpiryTime = undefined
-         // saving the updated field
-         await fetchUser.save({ validateBeforeSave: false })*/
+        fetchUser.passwordResetToken = undefined
+        fetchUser.passwordExpiryTime = undefined
+        // saving the updated field
+        await fetchUser.save({ validateBeforeSave: false })
         // return the error 
         return next(new errorHandling('Error in sending mail.Please try again later', 500))
     }
@@ -183,7 +183,7 @@ module.exports.resetPassword = async (req, res, next) => {
         let passwordConfirm = req.body.passwordConfirm;
         // if the password and passwordConfirm field is empty
         if (!password || !passwordConfirm) return next(new errorHandling("Please fill out the form", 404))
-        
+
         //Getting token from  
         let token = req.params.token
 
