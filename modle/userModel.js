@@ -62,7 +62,7 @@ userSchema.pre("save",async function(next){
 userSchema.methods.createPasswordResetToken = async function () {
     try {
         const resetToken = await crypto.randomBytes(32).toString('hex');
-        this.passwordResetToken = await bcrypt.hash(resetToken, 12);
+        this.passwordResetToken =resetToken
         this.passwordExpiryTime = Date.now() + 10 * 60 * 1000;
 
         return resetToken;

@@ -145,6 +145,7 @@ module.exports.forgotPassword = async (req, res, next) => {
 
     //preparing the message 
     const message = `You have received your reset url.\n\n ${resetUrl} \n\n Your reset url will expire after 10 minutes `
+    console.log(message);
     // calling sendEmail function inside try block
     try {
         await sendEmail({
@@ -159,10 +160,10 @@ module.exports.forgotPassword = async (req, res, next) => {
 
     } catch (err) {
         // if there is an error in sending email then set below field value to undefined
-        fetchUser.passwordResetToken = undefined
-        fetchUser.passwordExpiryTime = undefined
-        // saving the updated field
-        await fetchUser.save({ validateBeforeSave: false })
+        /* fetchUser.passwordResetToken = undefined
+         fetchUser.passwordExpiryTime = undefined
+         // saving the updated field
+         await fetchUser.save({ validateBeforeSave: false })*/
         // return the error 
         return next(new errorHandling('Error in sending mail.Please try again later', 500))
     }
@@ -175,25 +176,52 @@ module.exports.forgotPassword = async (req, res, next) => {
 // @method:PATCH
 // @endPoint:localhost:3000//api/v1/user/resetPassword/:token
 // @desc: Controller to update the password
-module.exports.resetPassword=async(req,res,next)=>{
-    let password=req.body.password
-    let hashedtoken=await bcrypt.hash(req.params.token,12)
-    let user=User.findOne({passwordResetToken:hashedtoken})
-    if(!user || user.passwordExpiryTime>Date.now()){
-
-        user.passwordResetToken=undefined
-        user.passwordExpiryTime=undefined
-        user.save({validateBeforeSave:false})
-        return next(new errorHandling("Reset token is invalid or time has expired",404))
+module.exports.resetPassword = async (req, res, next) => {
+    try {
+        // Get password and password confirmation from the request body
+        let password = req.body.password;
+        let passwordConfirm = req.body.passwordConfirm;
+        // if the password and passwordConfirm field is empty
+        if (!password || !passwordConfirm) return next(new errorHandling("Please fill out the form", 404))
         
-    } 
-    user.password=password
-    user.passwordResetToken=undefined
-    user.passwordExpiryTime=undefined
-    user.save()
-    res.status(200).json({
-        status:"success",
-        message:"You password has changed"
-    })
+        //Getting token from  
+        let token = req.params.token
 
-}
+        // Find a user with the matching passwordResetToken in the database
+        let user = await User.findOne({ passwordResetToken: token });
+        console.log(user)
+        // Check if the user does not exist or if the password reset token has expired
+        if (!user || user.passwordExpiryTime < Date.now()) {
+            // Clear the passwordResetToken and passwordExpiryTime fields for the user
+            user.passwordResetToken = undefined;
+            user.passwordExpiryTime = undefined;
+
+            // Save the user without validation before saving
+            await user.save({ validateBeforeSave: false });
+
+            // Return an error indicating that the reset token is invalid or has expired
+            return next(new errorHandling("Reset token is invalid or time has expired", 404));
+        }
+
+        // Set the new password and password confirmation for the user
+        user.password = password;
+        user.passwordConfirm = passwordConfirm;
+
+        // Clear the passwordResetToken and passwordExpiryTime fields for the user
+        user.passwordResetToken = undefined;
+        user.passwordExpiryTime = undefined;
+
+        // Save the user with the updated password information
+        await user.save();
+
+        // Return a success response indicating that the password has been changed
+        res.status(200).json({
+            status: "success",
+            message: "Your password has changed"
+        });
+    } catch (error) {
+        next(new errorHandling(error.message, 500))
+
+    }
+
+} 
