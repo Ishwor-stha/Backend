@@ -171,3 +171,29 @@ module.exports.forgotPassword = async (req, res, next) => {
 
 
 }
+
+// @method:PATCH
+// @endPoint:localhost:3000//api/v1/user/resetPassword/:token
+// @desc: Controller to update the password
+module.exports.resetPassword=async(req,res,next)=>{
+    let password=req.body.password
+    let hashedtoken=await bcrypt.hash(req.params.token,12)
+    let user=User.findOne({passwordResetToken:hashedtoken})
+    if(!user || user.passwordExpiryTime>Date.now()){
+
+        user.passwordResetToken=undefined
+        user.passwordExpiryTime=undefined
+        user.save({validateBeforeSave:false})
+        return next(new errorHandling("Reset token is invalid or time has expired",404))
+        
+    } 
+    user.password=password
+    user.passwordResetToken=undefined
+    user.passwordExpiryTime=undefined
+    user.save()
+    res.status(200).json({
+        status:"success",
+        message:"You password has changed"
+    })
+
+}
