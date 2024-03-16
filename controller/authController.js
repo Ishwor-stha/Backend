@@ -71,7 +71,7 @@ module.exports.login = async (req, res, next) => {
 
 
 
-// @endpoint:there is no end point for this controller
+// @endpoint:there is no end point for this middleware
 // @desc:controller for checking the if the user is login or not 
 module.exports.protect = async (req, res, next) => {
     let token
@@ -228,21 +228,28 @@ module.exports.resetPassword = async (req, res, next) => {
 }
 
 // @method:PATCH
-// @endPoint:localhost:3000/api/v1/user/updatePassword
-// @desc:Controller to update new password
+// @endPoint:localhost:3000/api/v1/user/updatePassword  (NOTE:protect middleware will be called first)
+// @desc:Controller to update  password
 
 module.exports.updatePassword = async (req, res, next) => {
     try {
-        let user = req.userId//from protect middleware
-       
+
+        let user = req.userId//fetching user id from protect middleware
+        //    if the req.body.password and req.body.passwordConfirm is empty then
         if (!req.body.password || !req.body.passwordConfirm) return next(new errorHandling("please fill up the form", 404))
+        // fetching ther user details from DB by id
         let updateUser = await User.findById(user)
+        // if there is no user by respective id then return error
         if (!updateUser) return next(new errorHandling(`something went wrong`, 500))
 
+        //putting the new password to the password field same goes to the passwordConfirm field
         updateUser.password = req.body.password
+
         updateUser.passwordConfirm = req.body.passwordConfirm
+        // Saving the updated password on DB
         await updateUser.save()
 
+        // sending response
         res.status(200).json({
             status: "success",
             message: "Your password has been changed"
@@ -250,7 +257,7 @@ module.exports.updatePassword = async (req, res, next) => {
 
 
     } catch (error) {
-        next(new errorHandling(error.message,500))
+        next(new errorHandling(error.message, 500))
 
     }
 }
