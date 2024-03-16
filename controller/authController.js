@@ -98,9 +98,10 @@ module.exports.protect = async (req, res, next) => {
     const userAvaiable = await User.findById(decode.id)
 
     //if user is not avaiable then  
-    if (!userAvaiable) next(new errorHandling("Please create a account ", 400))
+    if (!userAvaiable) next(new errorHandling("Please create a account or login", 400))
     // storing user role in req.role. (I stored  making new .role to check if role of an user in next middleware ie(isadmin))
     req.role = userAvaiable.role
+    req.userId = userAvaiable._id
     next()//calling next middleware
 }
 
@@ -224,4 +225,32 @@ module.exports.resetPassword = async (req, res, next) => {
 
     }
 
-} 
+}
+
+// @method:PATCH
+// @endPoint:localhost:3000/api/v1/user/updatePassword
+// @desc:Controller to update new password
+
+module.exports.updatePassword = async (req, res, next) => {
+    try {
+        let user = req.userId//from protect middleware
+       
+        if (!req.body.password || !req.body.passwordConfirm) return next(new errorHandling("please fill up the form", 404))
+        let updateUser = await User.findById(user)
+        if (!updateUser) return next(new errorHandling(`something went wrong`, 500))
+
+        updateUser.password = req.body.password
+        updateUser.passwordConfirm = req.body.passwordConfirm
+        await updateUser.save()
+
+        res.status(200).json({
+            status: "success",
+            message: "Your password has been changed"
+        })
+
+
+    } catch (error) {
+        next(new errorHandling(error.message,500))
+
+    }
+}

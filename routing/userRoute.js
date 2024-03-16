@@ -6,6 +6,7 @@ router.route('/').post(auth.createUser)
 router.route('/login').post(auth.login)
 router.route('/forgotPassword').post(auth.forgotPassword)
 router.route('/resetPassword/:token').patch(auth.resetPassword)
+router.route('/updatePassword').patch(auth.protect,auth.updatePassword)
 
 
 
