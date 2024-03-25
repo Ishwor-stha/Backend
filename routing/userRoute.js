@@ -1,12 +1,15 @@
-const auth=require('../controller/authController')//importing the authController middlewares
+const authController=require('../controller/authController')//importing the authController middlewares
+const userController=require('../controller/userController')
 const express = require('express')
 const router= express.Router()
 
-router.route('/').post(auth.createUser)
-router.route('/login').post(auth.login)
-router.route('/forgotPassword').post(auth.forgotPassword)
-router.route('/resetPassword/:token').patch(auth.resetPassword)
-router.route('/updatePassword').patch(auth.protect,auth.updatePassword)
+router.route('/').post(authController.createUser)
+router.route('/login').post(authController.login)
+router.route('/forgotPassword').post(authController.forgotPassword)
+router.route('/resetPassword/:token').patch(authController.resetPassword)
+router.route('/updatePassword').patch(authController.protect,authController.updatePassword)
+router.route('/updateProfile').patch(authController.protect,userController.updateProfile)
+
 
 
 

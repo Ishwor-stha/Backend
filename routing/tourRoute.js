@@ -1,5 +1,5 @@
 const express = require('express')
-const tours = require('../controller/getTour')//importing  the middlewares of tourcontroller 
+const tours = require('../controller/tourController')//importing  the middlewares of tourcontroller 
 const authController=require('../controller/authController')
 const router = express.Router()
 
