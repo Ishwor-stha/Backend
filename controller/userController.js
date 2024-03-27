@@ -1,6 +1,7 @@
 const User = require('../modle/userModel');
 const errorHandling=require('../util/errorHandling')
 
+// @desc: function for filtering the field name 
 const filteredData = (req, ...fields) => {
     const data = {};
 
@@ -12,6 +13,10 @@ const filteredData = (req, ...fields) => {
     return data;
 };
 
+
+// method:PATCH
+// @EndPoint:localhost:3000/api/v1/user/updateProfile
+// @desc : A controller for updating the user detail(ie.name,email) 
 module.exports.updateProfile = async (req, res, next) => {
     try {
         const userId = req.userId;
