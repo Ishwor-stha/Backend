@@ -6,15 +6,16 @@ const sendEmail = require('../util/sendMail')
 
 // creating a JWT Token {payload is the newly created id of user },secretkey,and the JWT Expiration date=30days 
 const createJwtToken=(res,userId,JwtSecretKey,JwtExpireDay)=>{
+    // creating jwt token
     const token = jwt.sign({ id: userId }, JwtSecretKey, { expiresIn:JwtExpireDay})
     const cookieOptions={
-        expires:Date.now()+(30*24*60*60*1000),//date into milisecond
+        maxAge:Date.now()+(30*24*60*60*1000),//date into milisecond
         // the below secure option doesnot send cookie if connection is http. 
         // secure:true,
         httpOnly:true
 
     }
-    
+    //  sending jwt token to via cookie
     res.cookie('jwt',token,cookieOptions)
     return token
 
