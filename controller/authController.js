@@ -4,6 +4,22 @@ const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
 const sendEmail = require('../util/sendMail')
 
+// creating a JWT Token {payload is the newly created id of user },secretkey,and the JWT Expiration date=30days 
+const createJwtToken=(res,userId,JwtSecretKey,JwtExpireDay)=>{
+    const token = jwt.sign({ id: userId }, JwtSecretKey, { expiresIn:JwtExpireDay})
+    const cookieOptions={
+        expires:Date.now()+(30*24*60*60*1000),//date into milisecond
+        // the below secure option doesnot send cookie if connection is http. 
+        // secure:true,
+        httpOnly:true
+
+    }
+    
+    res.cookie('jwt',token,cookieOptions)
+    return token
+
+}
+
 // @method:POST
 // @endpoint :localhost:3000/api/v1/user
 //@desc: controller for creating the new user /registering the new user
@@ -20,8 +36,11 @@ module.exports.createUser = async (req, res, next) => {
             password: req.body.password,
             passwordConfirm: req.body.passwordConfirm
         })
-        // creating a JWT Token {payload is the newly created id of user },secretkey,and the JWT Expiration date=30days 
-        const token = jwt.sign({ id: createNewUser._id }, process.env.JWT_SECRETKEY, { expiresIn: process.env.JWT_EXPIRE_DateInDay })
+        // calling a function to create a jwt token and sending via cookie
+        const token = createJwtToken(res,createNewUser._id, process.env.JWT_SECRETKEY, process.env.JWT_EXPIRE_DateInDay)
+        // Not diaplaying the password to  user in response 
+        createNewUser.password=undefined
+
         res.status(201).json({
             token: token,
             status: "success",
@@ -48,7 +67,7 @@ module.exports.login = async (req, res, next) => {
     const DbUserDetail = await User.findOne({ name: userName })
 
     // if there is no userDetail then terminate current middleware and call errorhandling middleware
-    if (!DbUserDetail) return next(new errorHandling("The username or password is incorrect", 401))
+    if (!DbUserDetail) return next(new errorHandling("User not found!", 401))
 
     // storing the hashed userpassword of db in variable
     const dbPassword = DbUserDetail.password
@@ -59,6 +78,8 @@ module.exports.login = async (req, res, next) => {
     // if password doesnot match then terminate this/current middleware and call error handling middleware
     if (!validPassword) return next(new errorHandling("The username or password is incorrect", 401))
 
+    // calling the function
+    createJwtToken(res,DbUserDetail._id,process.env.JWT_SECRETKEY,process.env.JWT_EXPIRE_DateInDay)
     // if password and username is valid then send the response
     res.status(200).json({
         status: "success",
