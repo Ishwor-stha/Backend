@@ -2,11 +2,15 @@ const express = require('express')
 const app = express()
 const dotenv = require('dotenv')
 const mongoose = require('mongoose')
+const rateLimit=require('express-rate-limit')
+const mongoSanitize = require('express-mongo-sanitize');
+
+
 const errorHandling=require('./util/errorHandling')
 const errorController=require('./controller/errorController')
 const tourRoute=require('./routing/tourRoute')
 const userRoute=require('./routing/userRoute')
-const rateLimit=require('express-rate-limit')
+
 
 /***********************************Limiting the request ****************************************************** */
 // limit the request from the Ip address
@@ -22,10 +26,18 @@ app.use(limiter)
 
  /*******Some configuration ********************************************************************************* */
  
+
  // Parse incoming JSON request bodies
 app.use(express.json());
 // Configure dotenv to load environment variables from config.env file
 dotenv.config({ path: './config.env' });
+
+
+
+/************************Preventing from nosql injection and xss************************/
+
+app.use(mongoSanitize());//calling function on middleware to prevent NOSql injection
+
 
 
 
